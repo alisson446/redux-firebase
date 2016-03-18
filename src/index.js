@@ -63,14 +63,16 @@ const addTodo = (todo) => {
 const updateTodo = (id, todo) => {
   return (dispatch) => {
     dispatch(localUpdateTodo(id, todo));
-    firebaseRef.update(store.getState());
+    firebaseRef.child(id);
+    firebaseRef.update({[id]: todo});
   };
 }
 
 const removeTodo = (id) => {
   return (dispatch) => {
     dispatch(localRemoveTodo(id));
-    firebaseRef.remove(store.getState());
+    firebaseRef.child(id);
+    firebaseRef.remove();
   };
 }
 
