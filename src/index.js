@@ -22,7 +22,7 @@ function getUniqueId() {
 const reducer = (state = {}, action) => {
   switch (action.type) {
     case SHOW:
-      let obj = Object.assign(state, action.payload.values);
+      let obj = Object.assign({}, state, action.payload.values);
       idAvailable = Object.keys(obj).length;
       return obj;
 
@@ -42,7 +42,6 @@ const reducer = (state = {}, action) => {
     default:
       return state;
   }
-  return state;
 }
 
 const logger = createLogger();
@@ -115,8 +114,9 @@ class Teste extends React.Component {
 
   componentDidMount() {
     store.dispatch(showTodo());
-    console.log(store.getState());
-    this.setState({todos: store.getState()});
+    let lista = store.getState();
+    console.log(lista);
+    this.setState({todos: lista});
   }
 
   render() {
