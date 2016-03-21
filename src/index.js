@@ -1,5 +1,5 @@
-import React from 'react';
-import { render } from 'react-dom';
+/*import mocha from 'mocha';
+import { expect } from 'chai';*/
 import Firebase from 'firebase';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
@@ -9,49 +9,58 @@ import _ from 'lodash';
 
 const firebaseRef = new Firebase('https://blazing-fire-8383.firebaseio.com/');
 
-const SHOW = 'SHOW';
+const SYNC = 'SYNC';
+const UNSYNC = 'UNSYNC';
 const ADD = 'ADD';
 const UPDATE = 'UPDATE';
 const REMOVE = 'REMOVE';
+const REMOVE_ALL = 'REMOVE_ALL';
 
-let idAvailable = 0;
-function getUniqueId() {
-  return idAvailable++;
-}
+const initialState = Map({
+  isSyncing: false,
+  items: Map()
+});
 
-const reducer = (state = {}, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case SHOW:
-      let obj = Object.assign({}, state, action.payload.values);
-      idAvailable = Object.keys(obj).length;
-      return obj;
+    case SYNC: 
+      return state.setIn(['isSyncing'], true);
 
-    case ADD:
-      return Object.assign({}, state, {
-        [getUniqueId()]: action.payload.todo
-      });
+    case UNSYNC: 
+      return state.setIn(['isSyncing'], false);
 
     case UPDATE:
-      return Object.assign({}, state, {
-        [action.payload.id]: action.payload.todo
-      });
+
+    case ADD:
+      return state.setIn(['items', action.payload.id], action.payload.todo);
 
     case REMOVE:
-      return _.omit(state, [action.payload.id]);
+      return state.removeIn(['items', action.payload.id]);
+
+    case REMOVE_ALL:
+      return state.removeIn(['items']);
 
     default:
       return state;
   }
 }
 
-const logger = createLogger();
+const logger = createLogger({
+  collapsed: true,
+  stateTransformer: (state) => state.toJS()
+});
+
 const store = createStore(reducer, applyMiddleware(thunk, logger));
 
-const localShowTodo = (values) => {
-  return { type: SHOW, payload: { values } };
+
+const localSync = () => {
+  return { type: SYNC } 
 }
-const localAddTodo = (todo) => {
-  return { type: ADD, payload: { todo } };
+const localUnsync = () => {
+  return { type: UNSYNC } 
+}
+const localAddTodo = (id, todo) => {
+  return { type: ADD, payload: { id, todo } };
 }
 const localUpdateTodo = (id, todo) => {
   return { type: UPDATE, payload: { id, todo } };
@@ -59,54 +68,117 @@ const localUpdateTodo = (id, todo) => {
 const localRemoveTodo = (id) => {
   return { type: REMOVE, payload: { id } };
 }
+const localRemoveAll = () => {
+  return {type: REMOVE_ALL, payload: {} };
+}
 
-const showTodo = () => {
+const callbackSyncAdd = (snapshot) => {
+  dispatch(localAddTodo(snapshot.key(), snapshot.val()));
+}
+
+const callbackSyncUpdate = (snapshot) => {
+  dispatch(localUpdateTodo(snapshot.key(), snapshot.val()));
+}
+
+const callbackSyncRemove = (snapshot) => {
+  dispatch(localRemoveTodo(snapshot.key(), snapshot.val()));
+}
+
+const syncTodos = () => {
+  return (dispatch, getState) => {
+    if(!getState().get('isSyncing')) {
+      dispatch(localSync());
+      firebaseRef.child('todos').on('child_added', callbackAdd);
+
+      firebaseRef.child('todos').on('child_changed', callbackUpdate);
+
+      firebaseRef.child('todos').on('child_removed', callbackRemove);
+    }
+  }
+}
+
+const unsyncTodos = () => {
   return (dispatch) => {
-    firebaseRef.on('value', (allValues) => {
-      if(allValues) {
-        dispatch(localShowTodo(allValues.val()));
-      }
+    firebaseRef.child('todos').off('child_added', callbackAdd);
+    firebaseRef.child('todos').off('child_changed', callbackUpdate);
+    firebaseRef.child('todos').off('child_removed', callbackRemove);
+    dispatch(localUnsync());
+  }
+}
+
+const fetchTodos = () => {
+  return (dispatch) => {
+    firebaseRef.child('todos').once('value', (snapshot) => {
+      snapshot.forEach((childSnapshot) => {
+        dispatch(localAddTodo(childSnapshot.key(), childSnapshot.val()));
+      });
     });
   };
 }
 
 const addTodo = (todo) => {
   return (dispatch) => {
-    dispatch(localAddTodo(todo));
-    firebaseRef.set(store.getState());
+    const todoId = firebaseRef.child('todos').push().key();
+    firebaseRef.child('todos').child(todoId).set(todo, (error) => {
+      if (!error) { console.log('add success'); }
+      else { console.log('error in add'); }
+    });
   };
 }
 
 const updateTodo = (id, todo) => {
   return (dispatch) => {
-    dispatch(localUpdateTodo(id, todo));
-    let firebaseRefUpdate = firebaseRef.child(id);
-    firebaseRefUpdate.update({[id]: todo});
+    firebaseRef.child('todos').child(id).set(todo, (error) => {
+      if(!error) { console.log('update success') }
+      else { console.log('error in update') }
+    });
   };
 }
 
 const removeTodo = (id) => {
   return (dispatch) => {
-    dispatch(localRemoveTodo(id));
-    let firebaseRefRemove = firebaseRef.child(id);
-    firebaseRefRemove.remove();
+    firebaseRef.child('todos').child(id).remove();
   };
 }
 
-/*console.log(Map(store.getState()).equals(Map({})));
-store.dispatch(showTodo());
-setTimeout(store.dispatch(addTodo('title')), 200);
-setTimeout(store.dispatch(addTodo('title2')), 200);
+const removeAllTodos = () => {
+  return (dispatch) => {
+    firebaseRef.child('todos').remove();
+  }
+}
+
+// TEST
+/*mocha.setup('bdd');
+
+describe('redux + firebase', () => {
+  describe('add todo to redux', () => {
+
+  });
+});
+
+mocha.run();*/
+
+// store.dispatch(removeAllTodos());
+// store.dispatch(addTodo('A'));
+// store.dispatch(addTodo('B'));
+// store.dispatch(addTodo('C'));
+// store.dispatch(fetchTodos());
+/*store.dispatch(updateTodo('-KDPYlCxb3SfMpLbRPuX', 'D'));
+store.dispatch(removeTodo('-KDPYlD4VOne46QAeY1i'));*/
+// store.dispatch(removeAllTodos());
+ store.dispatch(syncTodos());
+ store.dispatch(unsyncTodos());
+/*setTimeout(, 200);
 setTimeout(store.dispatch(addTodo('title3')), 200);
-console.log(Map(store.getState()).equals(Map({ 0: 'title', 1: 'title2', 2: 'title3'})));
-store.dispatch(updateTodo(3, 'title1'));
-console.log(Map(store.getState()).equals(Map({ 0: 'title1', 1: 'title2', 2: 'title3'})));
-store.dispatch(removeTodo(0));
+console.log(Map(store.getState()).equals(Map({ 1: 'title', 2: 'title2', 3: 'title3'})));
+store.dispatch(updateTodo(1, 'title1'));
+console.log(Map(store.getState()).equals(Map({ 1: 'title1', 2: 'title2', 3: 'title3'})));
 store.dispatch(removeTodo(1));
 store.dispatch(removeTodo(2));
+store.dispatch(removeTodo(3));
 console.log(Map(store.getState()).equals(Map({})));*/
 
-class Teste extends React.Component {
+/*class Teste extends React.Component {
   constructor(props) {
     super(props);
     this.state = { todos: {} };
@@ -135,4 +207,4 @@ class Teste extends React.Component {
   }
 }
 
-render(<Teste />, document.getElementById('root'));
+render(<Teste />, document.getElementById('root'));*/
