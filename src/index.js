@@ -1,12 +1,9 @@
-// import { App } from './App';
-
-// render(<App />, document.getElementById('root'));
-
 import React from 'react';
 import { render } from 'react-dom';
 import Firebase from 'firebase';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
+import createLogger from 'redux-logger';
 import { Map, OrderedMap } from 'immutable';
 import _ from 'lodash';
 
@@ -27,7 +24,6 @@ const reducer = (state = {}, action) => {
     case SHOW:
       let obj = Object.assign(state, action.payload.values);
       idAvailable = Object.keys(obj).length;
-      console.log(obj);
       return obj;
 
     case ADD:
@@ -49,7 +45,8 @@ const reducer = (state = {}, action) => {
   return state;
 }
 
-const store = createStore(reducer, applyMiddleware(thunk));
+const logger = createLogger();
+const store = createStore(reducer, applyMiddleware(thunk, logger));
 
 const localShowTodo = (values) => {
   return { type: SHOW, payload: { values } };
@@ -67,7 +64,7 @@ const localRemoveTodo = (id) => {
 const showTodo = () => {
   return (dispatch) => {
     firebaseRef.on('value', (allValues) => {
-      if(allValues) { 
+      if(allValues) {
         dispatch(localShowTodo(allValues.val()));
       }
     });
@@ -97,7 +94,7 @@ const removeTodo = (id) => {
   };
 }
 
-console.log(Map(store.getState()).equals(Map({})));
+/*console.log(Map(store.getState()).equals(Map({})));
 store.dispatch(showTodo());
 setTimeout(store.dispatch(addTodo('title')), 200);
 setTimeout(store.dispatch(addTodo('title2')), 200);
@@ -108,16 +105,17 @@ console.log(Map(store.getState()).equals(Map({ 0: 'title1', 1: 'title2', 2: 'tit
 store.dispatch(removeTodo(0));
 store.dispatch(removeTodo(1));
 store.dispatch(removeTodo(2));
-console.log(Map(store.getState()).equals(Map({})));
+console.log(Map(store.getState()).equals(Map({})));*/
 
 class Teste extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { todos: null };
+    this.state = { todos: {} };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     store.dispatch(showTodo());
+    console.log(store.getState());
     this.setState({todos: store.getState()});
   }
 
@@ -128,7 +126,7 @@ class Teste extends React.Component {
         <ul>
           {Object.keys(this.state.todos).map((t) => {
             return(
-              <li>{t}</li>
+              <li>{this.state.todos[t]}</li>
             );
           })}
         </ul>
