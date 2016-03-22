@@ -6,6 +6,8 @@
     "clean": "rimraf dist",
     "build:webpack": "cross-env NODE_ENV=production webpack --config webpack.config.prod.js",
     "build": "npm run clean && npm run build:webpack",
+    "test": "mocha src/**/*.spec.js --recursive --require babel-register",
+    "test:watch": "mocha src/**/*.spec.js --recursive --watch --require babel-register",
     "start": "node devServer.js",
     "lint": "eslint src"
   },
@@ -51,7 +53,9 @@
     "webpack-hot-middleware": "^2.9.1"
   },
   "dependencies": {
+    "babel-register": "^6.7.2",
     "chai": "^3.5.0",
+    "es6-promise": "^3.1.2",
     "firebase": "^2.4.1",
     "immutable": "^3.7.6",
     "lodash": "^4.6.1",
