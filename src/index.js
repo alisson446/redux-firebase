@@ -36,34 +36,3 @@ const store = createStore(rootReducer, applyMiddleware(thunk, logger));
 // store.dispatch(removeTodo(2));
 // store.dispatch(removeTodo(3));
 // console.log(Map(store.getState()).equals(Map({})));
-
-/*class Teste extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { todos: {} };
-  }
-
-  componentDidMount() {
-    store.dispatch(showTodo());
-    let lista = store.getState();
-    console.log(lista);
-    this.setState({todos: lista});
-  }
-
-  render() {
-    return(
-      <div>
-        <h3>lista</h3>
-        <ul>
-          {Object.keys(this.state.todos).map((t) => {
-            return(
-              <li>{this.state.todos[t]}</li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  }
-}
-
-render(<Teste />, document.getElementById('root'));*/

@@ -1,57 +1,49 @@
-// import mocha from 'mocha';
-// import { expect } from 'chai';
-// import Firebase from 'firebase';
+import mocha from 'mocha';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import { 
+  fbSyncTodos,
+  fbUnsyncTodos,
+  fbFetchTodos,
+  fbAddTodo,
+  fbUpdateTodo,
+  fbRemoveTodo,
+  fbRemoveAllTodos
+} from './firebase';
 
-// describe('firebase methods', function () {
+describe('spy firebase methods', () => {
+  let objectTest;
+  let methods;
 
-//   const firebaseRef = new Firebase('https://redux-firebase-test.firebaseio.com/');
+  beforeEach(() => {
+    methods = {
+      fbFetchTodos,
+      fbAddTodo,
+      fbUpdateTodo,
+      fbRemoveTodo,
+      fbRemoveAllTodos
+    };
+  });
 
-//   beforeEach(function (done) {
-//     this.timeout(15000);
+  afterEach(() => {
+    objectTest.restore();
+  }); 
 
-//     firebaseRef.set(null, done);
-//   });
+  describe('spy fbAddTodo', () => {
+    it('should return true if send of the object is correct', () => {
+      objectTest = sinon.spy(methods, 'fbAddTodo');
+      methods.fbAddTodo('addTest');
+      expect(objectTest.calledWith('addTest')).to.equal(true);
+    });
+  });
 
-//   after(function (done) {
-//     this.timeout(15000);
+  describe('spy fbUpdateTodo', () => {
+    it('should return true if send of the object is correct', () => {
+      objectTest = sinon.spy(methods, 'fbUpdateTodo');
+      methods.fbAddTodo('addTest');
+      methods.fbUpdateTodo(1, 'updateTest');
+      expect(objectTest.calledWith(1, 'updateTest')).to.equal(true);
+    });
+  });
 
-//     firebaseRef.set(null, done);
-//   });
-
-//   describe('add redux to firebase', function () {
-//     it('should return object todo from firebase after save', function (done) {
-//       this.timeout(15000);
-
-//       const todoId = firebaseRef.child('todos').push().key();
-//       firebaseRef.child('todos').child(todoId).set('TestAdd', (error) => {
-
-//         firebaseRef.child('todos').child(todoId).once('value', (snapshot) => {
-//           expect(snapshot.val()).to.equal('TestAdd');
-//           done();
-//         });
-//       });
-
-//     });
-//   });
-
-//   describe('update redux to firebase', function() {
-//     it('should return object todo from firebase after update', function(done) {
-//       this.timeout(15000);
-
-//       const todoId = firebaseRef.child('todos').push().key();
-//       firebaseRef.child('todos').child(todoId).set('TestAdd', (error) => {
-
-//         firebaseRef.child('todos').child(todoId).once('value', (snapshot) => {
-//           firebaseRef.child('todos').child(snapshot.key()).set('testeUpdate', (error) => {
-//             firebaseRef.child('todos').child(snapshot.key()).once('value', (snapshot) => {
-//               expect(snapshot.val()).to.equal('testeUpdate');
-//               done();
-//           });
-//           });
-//         });
-//       });
-
-//     });
-//   });
-
-// });
+});
