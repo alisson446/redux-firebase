@@ -66,7 +66,7 @@ export function fbRemoveTodo(id) {
   });
 }
 
-export function fbRemoveAllTodos(id) {
+export function fbRemoveAllTodos() {
   return new Promise((resolve, reject) => {
     firebaseRef.child('todos').remove((error) => {
       if(!error) { resolve(); }
