@@ -51,7 +51,7 @@ export default function reducer(state = initialState, action) {
       return state.removeIn(['items', action.payload.id]);
 
     case REMOVE_ALL:
-      return state.removeIn(['items']);
+      return state.update('items', (items) => items.clear());
 
     default:
       return state;
@@ -184,4 +184,17 @@ export const removeAllTodos = () => {
       .then(() => dispatch(removeAllTodosSuccess()))
       .catch((error) => dispatch(removeAllTodosFail(error)));
   }
+}
+
+// test outputs
+export let _private = {};
+if (process.env.NODE_ENV !== 'production') {
+  _private = {
+    localSync,
+    localUnsync,
+    localAddTodo,
+    localUpdateTodo,
+    localRemoveTodo,
+    localRemoveAllTodos
+  };
 }

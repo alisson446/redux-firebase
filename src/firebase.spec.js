@@ -42,8 +42,8 @@ describe('spy firebase methods', () => {
   describe('spy fbRemoveTodo', () => {
     it('should return true if the method is sending id to remove correctly', () => {
       objectTest = sinon.spy(methods, 'fbRemoveTodo');
-      methods.fbRemoveTodo(1, 'removeTest');
-      expect(objectTest.calledWith(1, 'removeTest')).to.equal(true);
+      methods.fbRemoveTodo(1);
+      expect(objectTest.calledWith(1)).to.equal(true);
     });
   });
 

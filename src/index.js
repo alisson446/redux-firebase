@@ -1,3 +1,5 @@
+import React, { Component } from 'react';
+import { render } from 'react-dom';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
@@ -10,6 +12,7 @@ import rootReducer, {
   removeTodo,
   removeAllTodos
 } from './redux';
+import elasticsearch from 'elasticsearch';
 
 const logger = createLogger({
   collapsed: true,
@@ -17,6 +20,65 @@ const logger = createLogger({
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk, logger));
+// let client = elasticsearch.Client({
+//   host: 'localhost:9200',
+//   log: 'trace'
+// });
+
+// client.create({
+//   index: 'testindex2',
+//   type: 'testtype2',
+//   id: '2',
+//   body: { 
+//     title: 'b',
+//     number: '2' 
+//   }
+// });
+ 
+// client.search({
+//   index: 'testindex',
+//   body: {
+//     query: {
+//       match_all: {}
+//     }
+//   }
+// }, (error, response) => {
+//   console.log(response);
+// });  
+
+// client.search({
+//   index: 'testindex',
+//   q: 'title: hello'
+// }, (error, response) => {
+//   console.trace(response);
+// });
+
+// client.count({
+//   index: 'testindex'
+// }, (error, response) => {
+//   console.trace(response.count);
+// });
+
+// client.update({
+//   index: 'testindex',
+//   type: 'testtype',
+//   id: '1',
+//   body: {
+//     doc: {
+//       title: 'hello update!'
+//     }
+//   }
+// }, (error, response) => {
+//   console.log(response);
+// });
+
+// client.delete({
+//   index: 'testindex',
+//   type: 'testtype',
+//   id: '5'
+// }, (error, response) => {
+//   console.trace(response);
+// });
 
 // store.dispatch(removeAllTodos());
 // store.dispatch(addTodo('A'));
