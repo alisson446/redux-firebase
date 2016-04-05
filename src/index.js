@@ -34,8 +34,8 @@ class TodoApp extends Component {
     return (
       <div>
         <p>Todo List</p>
-        <AddTodo addTodoToReducer={addTodo} sync={syncTodos} />
-        <VisibleTodoList />
+        <AddTodo />
+        <VisibleTodoList/>
       </div>
     );
   }

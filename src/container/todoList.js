@@ -2,12 +2,19 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Todo from '../components/todo';
 
-const TodoList = ({ todos }) => {
+import {
+  syncTodos,
+  removeTodo
+} from '../redux';
+
+const TodoList = ({ todos, onTodoRemoveClick }) => {
   return (
     <ul>
-      {todos.map(todo =>
+      {todos.map((todo, id) =>
         <Todo
-          name={todo} />
+          id={id}
+          todo={todo}
+          onTodoRemoveClick={onTodoRemoveClick} />
       )}
     </ul>
   );
@@ -20,7 +27,12 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return { dispatch };
+  return { 
+    onTodoRemoveClick: (key) => {
+      dispatch(removeTodo(key));
+      dispatch(syncTodos());
+    }
+  };
 };
 
 const VisibleTodoList = connect(

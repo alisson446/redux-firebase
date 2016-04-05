@@ -1,7 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-const AddTodoContainer = ({ dispatch, addTodoToReducer, sync }) => {
+import {
+  syncTodos,
+  addTodo
+} from '../redux';
+
+const AddTodoContainer = ({ dispatch }) => {
   let input;
 
   return (
@@ -9,9 +14,9 @@ const AddTodoContainer = ({ dispatch, addTodoToReducer, sync }) => {
       <input ref={node => input = node} />
       <button 
         onClick={() => {
-          dispatch(addTodoToReducer(input.value));
+          dispatch(addTodo(input.value));
           input.value = '';
-          dispatch(sync());
+          dispatch(syncTodos());
         }}
       >
         Add Todo
