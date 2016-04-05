@@ -3,6 +3,8 @@ import { render } from 'react-dom';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
+import { Provider } from 'react-redux';
+import elasticsearch from 'elasticsearch';
 import rootReducer, {
   syncTodos,
   unsyncTodos,
@@ -12,7 +14,8 @@ import rootReducer, {
   removeTodo,
   removeAllTodos
 } from './redux';
-import elasticsearch from 'elasticsearch';
+
+import VisibleTodoList from './container/todoList';
 
 const logger = createLogger({
   collapsed: true,
@@ -20,6 +23,28 @@ const logger = createLogger({
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk, logger));
+
+class TodoApp extends Component {
+  componentDidMount() {
+    store.dispatch(fetchTodos());
+  }
+
+  render() {
+    return (
+      <div>
+        <p>Todo List</p>
+        <VisibleTodoList />
+      </div>
+    );
+  }
+};
+
+render(
+  <Provider store={store}>
+    <TodoApp />
+  </Provider>,
+  document.getElementById('app')
+);
 // let client = elasticsearch.Client({
 //   host: 'localhost:9200',
 //   log: 'trace'
@@ -29,12 +54,12 @@ const store = createStore(rootReducer, applyMiddleware(thunk, logger));
 //   index: 'testindex2',
 //   type: 'testtype2',
 //   id: '2',
-//   body: { 
+//   body: {
 //     title: 'b',
-//     number: '2' 
+//     number: '2'
 //   }
 // });
- 
+
 // client.search({
 //   index: 'testindex',
 //   body: {
@@ -44,7 +69,7 @@ const store = createStore(rootReducer, applyMiddleware(thunk, logger));
 //   }
 // }, (error, response) => {
 //   console.log(response);
-// });  
+// });
 
 // client.search({
 //   index: 'testindex',
