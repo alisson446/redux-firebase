@@ -16,6 +16,7 @@ import rootReducer, {
 } from './redux';
 
 import VisibleTodoList from './container/todoList';
+import AddTodo from './container/AddTodo';
 
 const logger = createLogger({
   collapsed: true,
@@ -33,6 +34,7 @@ class TodoApp extends Component {
     return (
       <div>
         <p>Todo List</p>
+        <AddTodo addTodoToReducer={addTodo} sync={syncTodos} />
         <VisibleTodoList />
       </div>
     );
