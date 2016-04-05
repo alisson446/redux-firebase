@@ -28,8 +28,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return { 
-    onTodoRemoveClick: (key) => {
-      dispatch(removeTodo(key));
+    onTodoRemoveClick: (id) => {
+      dispatch(removeTodo(id));
       dispatch(syncTodos());
     }
   };

@@ -17,6 +17,7 @@ import rootReducer, {
 
 import VisibleTodoList from './container/todoList';
 import AddTodo from './container/AddTodo';
+import Footer from './container/footer';
 
 const logger = createLogger({
   collapsed: true,
@@ -28,6 +29,11 @@ const store = createStore(rootReducer, applyMiddleware(thunk, logger));
 class TodoApp extends Component {
   componentDidMount() {
     store.dispatch(fetchTodos());
+    store.dispatch(syncTodos());
+  }
+
+  componentWillUnMount() {
+    store.dispatch(unsyncTodos());
   }
 
   render() {
@@ -36,6 +42,7 @@ class TodoApp extends Component {
         <p>Todo List</p>
         <AddTodo />
         <VisibleTodoList/>
+        <Footer />
       </div>
     );
   }
