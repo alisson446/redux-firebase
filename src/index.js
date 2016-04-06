@@ -28,7 +28,6 @@ const store = createStore(rootReducer, applyMiddleware(thunk, logger));
 
 class TodoApp extends Component {
   componentDidMount() {
-    store.dispatch(fetchTodos());
     store.dispatch(syncTodos());
   }
 

@@ -1,30 +1,29 @@
 import React from 'react';
 
-const Todo = ({ id, todo, todoUpdateClick, todoRemoveClick }) => {
+const Todo = ({ id, todo, onUpdateClick, onRemoveClick }) => {
   let input;
 
   return (
-    <div>
-      <li>
-        <input ref={(node) => input = node} defaultValue={todo} />
+    <li>
+      
+      <input
+        ref={(node) => input = node}
+        defaultValue={todo}
+        onKeyDown={(e) => {
+          if (e.which === 13) onUpdateClick(id, input.value);
+        }} />
 
-        <a href='#'
-          onClick={() => {
-            todoUpdateClick(id, input.value);
-          }}
-        >
-          editar
-        </a>
-      </li>
-
-      <a href='#'
+      <button
         onClick={() => {
-          todoRemoveClick(id);
-        }}
-      >
-        excluir
-      </a>
-    </div>
+          onUpdateClick(id, input.value);
+        }}>editar</button>
+
+      <button
+        onClick={() => {
+         onRemoveClick(id);
+        }}>excluir</button>
+
+    </li>
   );
 };
 

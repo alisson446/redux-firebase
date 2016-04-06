@@ -5,18 +5,14 @@ import {
   removeAllTodos
 } from '../redux';
 
-const footerComponent = ({ dispatch }) => {
+const Footer = ({ dispatch }) => {
   return (
     <button 
       onClick={() => {
         dispatch(removeAllTodos());
         dispatch(syncTodos());
-      }}
-    >
-      Remove All Todos
-    </button>
+      }}>Remove All Todos</button>
   );
 };
 
-const Footer = connect()(footerComponent);
-export default Footer;
+export default connect()(Footer);

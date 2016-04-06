@@ -1,22 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Todo from '../components/todo';
-
 import {
   syncTodos,
   updateTodo,
   removeTodo
 } from '../redux';
 
-const TodoList = ({ todos, todoUpdateClick, todoRemoveClick }) => {
+const TodoList = ({ todos, onUpdateClick, onRemoveClick }) => {
   return (
     <ul>
-      {todos.map((todo, id) =>
+      {todos.entrySeq().map((todoTuple) =>
         <Todo
-          id={id}
-          todo={todo}
-          todoUpdateClick={todoUpdateClick}
-          todoRemoveClick={todoRemoveClick} />
+          key={todoTuple[0]}
+          id={todoTuple[0]}
+          todo={todoTuple[1]}
+          onUpdateClick={onUpdateClick}
+          onRemoveClick={onRemoveClick} />
       )}
     </ul>
   );
@@ -30,13 +30,11 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return { 
-    todoRemoveClick: (id) => {
+    onRemoveClick: (id) => {
       dispatch(removeTodo(id));
-      dispatch(syncTodos());
     },
-    todoUpdateClick: (id, value) => {
+    onUpdateClick: (id, value) => {
       dispatch(updateTodo(id, value));
-      dispatch(syncTodos());
     }
   };
 };
